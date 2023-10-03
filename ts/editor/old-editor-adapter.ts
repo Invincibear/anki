@@ -9,8 +9,9 @@ export function pasteHTML(
     html: string,
     internal: boolean,
     extendedMode: boolean,
+    strippedMode: boolean,
 ): void {
-    html = filterHTML(html, internal, extendedMode);
+    html = filterHTML(html, internal, extendedMode, strippedMode);
 
     if (html !== "") {
         setFormat("inserthtml", html);
