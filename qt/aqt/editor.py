@@ -975,21 +975,25 @@ require("anki/ui").loaded.then(() => require("anki/NoteEditor").instances[0].too
         html = str(doc)
         return html
 
-    def doPaste(self, html: str, internal: bool, extended: bool = False) -> None:
+    def doPaste(self, html: str, internal: bool, extended: bool = False, stripped: bool = False) -> None:
         html = self._pastePreFilter(html, internal)
         if extended:
             ext = "true"
         else:
             ext = "false"
-        self.web.eval(f"pasteHTML({json.dumps(html)}, {json.dumps(internal)}, {ext});")
+        if stripped:
+            strip = "true"
+        else:
+            strip = "false"
+        self.web.eval(f"pasteHTML({json.dumps(html)}, {json.dumps(internal)}, {ext}, {strip});")
         gui_hooks.editor_did_paste(self, html, internal, extended)
 
     def doDrop(
-        self, html: str, internal: bool, extended: bool, cursor_pos: QPoint
+        self, html: str, internal: bool, extended: bool, cursor_pos: QPoint, stripped: bool
     ) -> None:
         def pasteIfField(ret: bool) -> None:
             if ret:
-                self.doPaste(html, internal, extended)
+                self.doPaste(html, internal, extended, stripped)
 
         self.web.evalWithCallback(
             f"focusIfField({cursor_pos.x()}, {cursor_pos.y()});", pasteIfField
@@ -1410,16 +1414,17 @@ class EditorWebView(AnkiWebView):
 
     def _onPaste(self, mode: QClipboard.Mode) -> None:
         extended = self._wantsExtendedPaste()
+        stripped = self._wantsStrippedPaste()
         if html := self._internal_field_text_for_paste:
             self._internal_field_text_for_paste = None
             print("reuse internal")
-            self.editor.doPaste(html, True, extended)
+            self.editor.doPaste(html, True, extended, stripped)
         else:
             print("use clipboard")
             mime = self.editor.mw.app.clipboard().mimeData(mode=mode)
             html, internal = self._processMime(mime, extended)
             if html:
-                self.editor.doPaste(html, internal, extended)
+                self.editor.doPaste(html, internal, extended, stripped)
 
     def onPaste(self) -> None:
         self._onPaste(QClipboard.Mode.Clipboard)
@@ -1432,6 +1437,7 @@ class EditorWebView(AnkiWebView):
 
     def dropEvent(self, evt: QDropEvent) -> None:
         extended = self._wantsExtendedPaste()
+        stripped = self._wantsStrippedPaste()
         mime = evt.mimeData()
         cursor_pos = self.mapFromGlobal(QCursor.pos())
 
@@ -1444,7 +1450,7 @@ class EditorWebView(AnkiWebView):
         if not html:
             return
 
-        self.editor.doDrop(html, internal, extended, cursor_pos)
+        self.editor.doDrop(html, internal, extended, cursor_pos, stripped)
 
     # returns (html, isInternal)
     def _processMime(
