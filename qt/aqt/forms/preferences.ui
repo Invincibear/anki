@@ -475,6 +475,19 @@
            </widget>
           </item>
           <item>
+           <widget class="QCheckBox" name="paste_strips_newlines">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="text">
+             <string>preferences_paste_strips_newlines</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="verticalSpacer_7">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
