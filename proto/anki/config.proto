@@ -124,6 +124,7 @@ message Preferences {
     bool paste_strips_formatting = 3;
     string default_search_text = 4;
     bool ignore_accents_in_search = 5;
+    bool paste_strips_newlines = 6;
   }
   message BackupLimits {
     uint32 daily = 1;
