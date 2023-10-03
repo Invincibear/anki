@@ -1402,6 +1402,12 @@ class EditorWebView(AnkiWebView):
             strip_html = not strip_html
         return not strip_html
 
+    def _wantsStrippedPaste(self) -> bool:
+        strip_newlines = self.editor.mw.col.get_config_bool(
+            Config.Bool.PASTE_STRIPS_NEWLINES
+        )
+        return strip_newlines
+
     def _onPaste(self, mode: QClipboard.Mode) -> None:
         extended = self._wantsExtendedPaste()
         if html := self._internal_field_text_for_paste:
