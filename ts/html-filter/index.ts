@@ -26,9 +26,13 @@ function trim(value: string): string {
     return value.trim();
 }
 
+function trim_newlines(value: string): string {
+    return value.trim().replace(/^\s\n+|\s\n+$/g,'');
+}
+
 const outputHTMLProcessors: Record<FilterMode, (outputHTML: string) => string> = {
     [FilterMode.Basic]: (outputHTML: string): string => trim(collapseWhitespace(outputHTML)),
-    [FilterMode.Extended]: trim,
+    [FilterMode.Extended]: trim_newlines,
     [FilterMode.Internal]: trim,
 };
 
